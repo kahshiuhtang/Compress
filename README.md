@@ -1,3 +1,18 @@
+# LUMBERJACK
+
+### Logging tool to consolidate logging into one central hub
+
+## Project Goals
+
+1) Send logging messages into one central server
+
+2) Create small compiler language for .conf file
+
+3) Use MQTT to publish messages and send to subscribers
+
+4) Implement fast searching algorithm through large file using GPU & CPU
+
+5) 
 
 ### Papers
 
@@ -14,3 +29,5 @@
 [DEFLATE](https://www.ietf.org/rfc/rfc1951.txt)
 
 [Burrows Wheeler](http://www.eecs.harvard.edu/~michaelm/CS222/burrows-wheeler.pdf)
+
+[Kafka](https://notes.stephenholiday.com/Kafka.pdf)
