@@ -2,6 +2,22 @@
 
 ### Logging tool to consolidate logging into one central hub
 
+## Summary
+
+I want to make a log storing system that will take logs from multiple servers and place them onto one centralized server
+
+I think logs should be split by where they came from and what "process" they come from. Logs will come in and be redirected to whatever DB by a message broker, if it is nessecary to store them long-term. Otherwise, logs will go into a log file, preferably by batch.
+
+To give the best chance at parallel searching, the format of these messages should be in the lines of 
+
+```
+[ServerSourceID] [BatchID] [Timestamp] [Message]
+```
+
+Some goals for lumberjack are to be easily scalable, easily configurable, and low resource.
+
+I have not completed doing research for this project, but I have some ideas in mind. I will use MQTT as the messaging protocol, store data to be backed up in MongoDB servers that are the master to a slave DB like Cassandra. I'm going to use my NVidia GPU for string search through logs in hopes of parallel performance boost, but I will mainly use C and/or Rust.
+
 ## Project Goals
 
 1) Send logging messages into one central server
@@ -12,7 +28,8 @@
 
 4) Implement fast searching algorithm through large file using GPU & CPU
 
-5) 
+5) Create logging system that is easily readable and 
+
 
 ### Papers
 
