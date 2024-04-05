@@ -11,27 +11,6 @@
 #include "lumber.h"
 
 
-/**
- * @brief The function that would be called whenever a PUBLISH is received.
- *
- * @note This function is not used in this example.
- */
-void publish_callback(void** unused, struct mqtt_response_publish *published);
-
-/**
- * @brief The client's refresher. This function triggers back-end routines to
- *        handle ingress/egress traffic to the broker.
- *
- * @note All this function needs to do is call \ref __mqtt_recv and
- *       \ref __mqtt_send every so often. I've picked 100 ms meaning that
- *       client ingress/egress traffic will be handled every 100 ms.
- */
-void* client_refresher(void* client);
-
-/**
- * @brief Safelty closes the \p sockfd and cancels the \p client_daemon before \c exit.
- */
-void exit_example(int status, int sockfd, pthread_t *client_daemon);
 
 /**
  * A simple program to that publishes the current time whenever ENTER is pressed.
@@ -132,66 +111,3 @@ int create_publisher(int argc, const char *argv[])
     exit_example(EXIT_SUCCESS, sockfd, &client_daemon);
     return 0;
 }
-
-int open_nb_socket(const char* addr, const char* port) {
-    struct addrinfo hints = {0};
-
-    hints.ai_family = AF_UNSPEC; /* IPv4 or IPv6 */
-    hints.ai_socktype = SOCK_STREAM; /* Must be TCP */
-    int sockfd = -1;
-    int rv;
-    struct addrinfo *p, *servinfo;
-
-    /* get address information */
-    rv = getaddrinfo(addr, port, &hints, &servinfo);
-    if(rv != 0) {
-        fprintf(stderr, "Failed to open socket (getaddrinfo): %s\n", gai_strerror(rv));
-        return -1;
-    }
-
-    /* open the first possible socket */
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (sockfd == -1) continue;
-
-        /* connect to server */
-        rv = connect(sockfd, p->ai_addr, p->ai_addrlen);
-        if(rv == -1) {
-          close(sockfd);
-          sockfd = -1;
-          continue;
-        }
-        break;
-    }  
-
-    /* free servinfo */
-    freeaddrinfo(servinfo);
-
-    /* make non-blocking */
-    if (sockfd != -1) fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL) | O_NONBLOCK);
-    return sockfd;
-}
-
-
-/*
-
-void exit_example(int status, int sockfd, pthread_t *client_daemon)
-{
-    if (sockfd != -1) close(sockfd);
-    if (client_daemon != NULL) pthread_cancel(*client_daemon);
-    exit(status);
-}
-void publish_callback(void** unused, struct mqtt_response_publish *published)
-{
-}
-
-void* client_refresher(void* client)
-{
-    while(1)
-    {
-        mqtt_sync((struct mqtt_client*) client);
-        usleep(100000U);
-    }
-    return NULL;
-}
-*/

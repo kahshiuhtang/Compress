@@ -10,25 +10,6 @@
 #include <mqtt.h>
 #include "lumber.h"
 
-/**
- * @brief The function will be called whenever a PUBLISH message is received.
- */
-void publish_callback(void** unused, struct mqtt_response_publish *published);
-
-/**
- * @brief The client's refresher. This function triggers back-end routines to
- *        handle ingress/egress traffic to the broker.
- *
- * @note All this function needs to do is call \ref __mqtt_recv and
- *       \ref __mqtt_send every so often. I've picked 100 ms meaning that
- *       client ingress/egress traffic will be handled every 100 ms.
- */
-void* client_refresher(void* client);
-
-/**
- * @brief Safelty closes the \p sockfd and cancels the \p client_daemon before \c exit.
- */
-void exit_example(int status, int sockfd, pthread_t *client_daemon);
 
 int create_subscriber(int argc, const char *argv[])
 {
@@ -108,37 +89,4 @@ int create_subscriber(int argc, const char *argv[])
     /* exit */
     exit_example(EXIT_SUCCESS, sockfd, &client_daemon);
     return 0;
-}
-
-
-
-void exit_example(int status, int sockfd, pthread_t *client_daemon)
-{
-    if (sockfd != -1) close(sockfd);
-    if (client_daemon != NULL) pthread_cancel(*client_daemon);
-    exit(status);
-}
-
-
-
-void publish_callback(void** unused, struct mqtt_response_publish *published)
-{
-    /* note that published->topic_name is NOT null-terminated (here we'll change it to a c-string) */
-    char* topic_name = (char*) malloc(published->topic_name_size + 1);
-    memcpy(topic_name, published->topic_name, published->topic_name_size);
-    topic_name[published->topic_name_size] = '\0';
-
-    printf("Received publish('%s'): %s\n", topic_name, (const char*) published->application_message);
-
-    free(topic_name);
-}
-
-void* client_refresher(void* client)
-{
-    while(1)
-    {
-        mqtt_sync((struct mqtt_client*) client);
-        usleep(100000U);
-    }
-    return NULL;
 }
