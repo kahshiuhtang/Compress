@@ -1,1 +1,2 @@
-build/main.o: src/main.c
+build/main.o: src/main.c include/lumber.h \
+ include/templates/posix_sockets.h
