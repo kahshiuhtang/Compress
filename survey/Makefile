@@ -9,12 +9,15 @@ GCC_OPTS=-O3 -Wall -Wextra -m64
 
 SRCD=src
 BIND=bin
+INCD=include
 BLDD=build
 
-OBJ = main.o compress.o decompress.o
+OBJ = main.o compress.o decompress.o huff.o
 SRC = main.cc
 OBJ := $(addprefix $(BLDD)/, $(OBJ))
 EXE = survey
+
+INC := -I $(INCD)
 
 ifdef TESTING 
 override TESTING = -DTESTING
@@ -35,14 +38,17 @@ $(BLDD):
 survey: $(OBJ) 
 	$(NVCC) $(TESTING) $(CACHECWLUT) $(NVCC_OPTS) $(OBJ) -o $(BIND)/$(EXE) 
 
-$(BLDD)/decompress.o: decompress.cu 
-	$(NVCC) $(TESTING) -c decompress.cu $(NVCC_OPTS) -o $(BLDD)/decompress.o
+$(BLDD)/decompress.o: $(SRCD)/decompress.cu 
+	$(NVCC) $(TESTING) -c $(SRCD)/decompress.cu $(NVCC_OPTS) -o $(BLDD)/decompress.o
 
-$(BLDD)/compress.o: compress.cu 
-	$(NVCC) -c compress.cu $(NVCC_OPTS) -o $(BLDD)/compress.o
+$(BLDD)/compress.o: $(SRCD)/compress.cu 
+	$(NVCC) -c $(SRCD)/compress.cu $(NVCC_OPTS) $(INC) -o $(BLDD)/compress.o
 
-$(BLDD)/main.o: main.cc 
-	$(NVCC) $(TESTING) -c main.cc $(NVCC_OPTS) -I $(CUDA_INCLUDEPATH) -o $(BLDD)/main.o
+$(BLDD)/main.o: $(SRCD)/main.cc 
+	$(NVCC) $(TESTING) -c $(SRCD)/main.cc $(NVCC_OPTS) -I $(CUDA_INCLUDEPATH) $(INC) -o $(BLDD)/main.o
+
+$(BLDD)/huff.o: $(SRCD)/huff.cc 
+	$(NVCC) $(TESTING) -c $(SRCD)/huff.cc $(NVCC_OPTS) -I $(CUDA_INCLUDEPATH) $(INC) -o $(BLDD)/huff.o
 
 .o:.cpp
 	$(CC) ++ $(GCC_OPTS) -c $@ -o $<
