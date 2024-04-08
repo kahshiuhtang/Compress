@@ -4,7 +4,8 @@
 #include <unistd.h>
 
 #include "lumber.h"
-#include "mill.h"
+#include "client.h"
+
 int main(int argc,  char **argv){
     int help_flag = 0;
     int publisher_flag = 0;
@@ -82,7 +83,7 @@ int main(int argc,  char **argv){
 
     }
     if(publisher_flag){
-
+        create_publisher(server, port, topic);
     }
     if(subscriber_flag){
         create_subscriber(server, port, topic);

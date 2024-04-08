@@ -1,6 +1,9 @@
-#include "lumber.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <syslog.h>
+
+#include "lumber.h"
+
 int lmb_print(int priority, const char *format, ...){
     va_list arg;
     int done;

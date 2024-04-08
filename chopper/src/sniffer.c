@@ -18,7 +18,7 @@
 #include<sys/types.h>
 #include<unistd.h>
 
-#include "mill.h"
+#include "client.h"
  
 void ProcessPacket(unsigned char* , int);
 void print_ip_header(unsigned char* , int);

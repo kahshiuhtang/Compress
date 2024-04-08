@@ -1,8 +1,9 @@
-#include "mill.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+
+#include "client.h"
 
 int open_nb_socket(const char* addr, const char* port) {
     struct addrinfo hints = {0};
