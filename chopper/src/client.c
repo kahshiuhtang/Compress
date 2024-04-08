@@ -15,30 +15,20 @@
 /**
  * A simple program to that publishes the current time whenever ENTER is pressed.
  */
-int create_publisher(int argc, const char *argv[])
+int create_publisher(const char *_serv_address, const char * _server_port, const char * _topic)
 {
-    const char* addr;
-    const char* port;
-    const char* topic;
+    const char* addr = _serv_address;
+    const char* port = _server_port;
+    const char* topic = _topic;
 
-    /* get address (argv[1] if present) */
-    if (argc > 1) {
-        addr = argv[1];
-    } else {
+    if (addr == NULL)  {
         addr = "test.mosquitto.org";
     }
-
-    /* get port number (argv[2] if present) */
-    if (argc > 2) {
-        port = argv[2];
-    } else {
+    if (port == NULL) {
         port = "1883";
     }
 
-    /* get the topic name to publish */
-    if (argc > 3) {
-        topic = argv[3];
-    } else {
+    if (topic == NULL) {
         topic = "datetime";
     }
 
@@ -47,7 +37,7 @@ int create_publisher(int argc, const char *argv[])
 
     if (sockfd == -1) {
         perror("Failed to open socket: ");
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
     }
 
     /* setup a client */
@@ -65,19 +55,19 @@ int create_publisher(int argc, const char *argv[])
     /* check that we don't have any errors */
     if (client.error != MQTT_OK) {
         fprintf(stderr, "error: %s\n", mqtt_error_str(client.error));
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
     }
 
     /* start a thread to refresh the client (handle egress and ingree client traffic) */
     pthread_t client_daemon;
     if(pthread_create(&client_daemon, NULL, client_refresher, &client)) {
         fprintf(stderr, "Failed to start client daemon.\n");
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
 
     }
 
     /* start publishing the time */
-    printf("%s is ready to begin publishing the time.\n", argv[0]);
+    printf("%s is ready to begin publishing the time.\n", addr);
     printf("Press ENTER to publish the current time.\n");
     printf("Press CTRL-D (or any other key) to exit.\n\n");
     while(fgetc(stdin) == '\n') {
@@ -91,7 +81,7 @@ int create_publisher(int argc, const char *argv[])
         /* print a message */
         char application_message[256];
         snprintf(application_message, sizeof(application_message), "The time is %s", timebuf);
-        printf("%s published : \"%s\"", argv[0], application_message);
+        printf("%s published : \"%s\"", addr, application_message);
 
         /* publish the time */
         mqtt_publish(&client, topic, application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_0);
@@ -99,43 +89,33 @@ int create_publisher(int argc, const char *argv[])
         /* check for errors */
         if (client.error != MQTT_OK) {
             fprintf(stderr, "error: %s\n", mqtt_error_str(client.error));
-            exit_example(EXIT_FAILURE, sockfd, &client_daemon);
+            client_exit(EXIT_FAILURE, sockfd, &client_daemon);
         }
     }
 
     /* disconnect */
-    printf("\n%s disconnecting from %s\n", argv[0], addr);
+    printf("\n%s disconnecting from %s\n", addr, addr);
     sleep(1);
 
     /* exit */
-    exit_example(EXIT_SUCCESS, sockfd, &client_daemon);
+    client_exit(EXIT_SUCCESS, sockfd, &client_daemon);
     return 0;
 }
 
-int create_subscriber(int argc, const char *argv[])
+int create_subscriber(const char *_serv_address, const char * _server_port, const char * _topic)
 {
-    const char* addr;
-    const char* port;
-    const char* topic;
+    const char* addr = _serv_address;
+    const char* port = _server_port;
+    const char* topic = _topic;
 
-    /* get address (argv[1] if present) */
-    if (argc > 1) {
-        addr = argv[1];
-    } else {
+    if (addr == NULL)  {
         addr = "test.mosquitto.org";
     }
-
-    /* get port number (argv[2] if present) */
-    if (argc > 2) {
-        port = argv[2];
-    } else {
+    if (port == NULL) {
         port = "1883";
     }
 
-    /* get the topic name to publish */
-    if (argc > 3) {
-        topic = argv[3];
-    } else {
+    if (topic == NULL) {
         topic = "datetime";
     }
 
@@ -144,7 +124,7 @@ int create_subscriber(int argc, const char *argv[])
 
     if (sockfd == -1) {
         perror("Failed to open socket: ");
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
     }
 
     /* setup a client */
@@ -162,14 +142,14 @@ int create_subscriber(int argc, const char *argv[])
     /* check that we don't have any errors */
     if (client.error != MQTT_OK) {
         fprintf(stderr, "error: %s\n", mqtt_error_str(client.error));
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
     }
 
     /* start a thread to refresh the client (handle egress and ingree client traffic) */
     pthread_t client_daemon;
     if(pthread_create(&client_daemon, NULL, client_refresher, &client)) {
         fprintf(stderr, "Failed to start client daemon.\n");
-        exit_example(EXIT_FAILURE, sockfd, NULL);
+        client_exit(EXIT_FAILURE, sockfd, NULL);
 
     }
 
@@ -177,17 +157,17 @@ int create_subscriber(int argc, const char *argv[])
     mqtt_subscribe(&client, topic, 0);
 
     /* start publishing the time */
-    printf("%s listening for '%s' messages.\n", argv[0], topic);
+    printf("%s listening for '%s' messages.\n", addr, topic);
     printf("Press CTRL-D to exit.\n\n");
 
     /* block */
     while(fgetc(stdin) != EOF);
 
     /* disconnect */
-    printf("\n%s disconnecting from %s\n", argv[0], addr);
+    printf("\n%s disconnecting from %s\n", addr, addr);
     sleep(1);
 
     /* exit */
-    exit_example(EXIT_SUCCESS, sockfd, &client_daemon);
+    client_exit(EXIT_SUCCESS, sockfd, &client_daemon);
     return 0;
 }

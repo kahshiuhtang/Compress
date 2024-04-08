@@ -11,22 +11,24 @@ int main(int argc,  char **argv){
     int subscriber_flag = 0;
     char * config_path = NULL;
     char * log_file_path = NULL;
+    char * server = NULL;
+    char * port = NULL;
+    char * topic = NULL;
     int index;
     int c;
 
     opterr = 0;
 
-
-    while ((c = getopt (argc, argv, "hpsc:f:")) != -1)
+    while ((c = getopt (argc, argv, "hyzc:f:a:p:t:")) != -1)
         switch (c)
         {
         case 'h':
             help_flag = 1;
             break;
-        case 'p':
+        case 'y':
             publisher_flag = 1;
             break;
-        case 's':
+        case 'z':
             subscriber_flag = 1;
             break;
         case 'c':
@@ -34,6 +36,15 @@ int main(int argc,  char **argv){
             break;
         case 'l':
             log_file_path = optarg;
+            break;
+        case 'a':
+            server = optarg;
+            break;
+        case 'p':
+            port = optarg;
+            break;
+        case 't':
+            topic = optarg;
             break;
         case '?':
             USAGE(*argv, EXIT_FAILURE);
@@ -70,8 +81,12 @@ int main(int argc,  char **argv){
         fclose(file);
 
     }
-    for (index = optind; index < argc; index++)
-        printf ("Non-option argument %s\n", argv[index]);
+    if(publisher_flag){
+
+    }
+    if(subscriber_flag){
+        create_subscriber(server, port, topic);
+    }
     return 0;
     //sniff_packets();
 }

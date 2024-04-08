@@ -43,7 +43,7 @@ int open_nb_socket(const char* addr, const char* port) {
     return sockfd;
 }
 
-void exit_example(int status, int sockfd, pthread_t *client_daemon)
+void client_exit(int status, int sockfd, pthread_t *client_daemon)
 {
     if (sockfd != -1) close(sockfd);
     if (client_daemon != NULL) pthread_cancel(*client_daemon);

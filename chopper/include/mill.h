@@ -24,14 +24,14 @@ void* client_refresher(void* client);
 /**
  * @brief Safelty closes the \p sockfd and cancels the \p client_daemon before \c exit.
  */
-void exit_example(int status, int sockfd, pthread_t *client_daemon);
+void client_exit(int status, int sockfd, pthread_t *client_daemon);
 
 /**
  * @brief Create a publisher client node
  *
  * Similar functionality to the actual syslog daemon
  */
-int create_publisher(int argc, const char *argv[]);
+int create_publisher(const char *_serv_address, const char * _server_port, const char * _topic);
 
 /**
  * @brief Create a subscriber client node
@@ -39,7 +39,7 @@ int create_publisher(int argc, const char *argv[]);
  * Similar functionality to the actual syslog daemon
  */
 
-int create_subscriber(int argc, const char *argv[]);
+int create_subscriber(const char *_serv_address, const char * _server_port, const char * _topic);
 
 
 /**
@@ -52,12 +52,14 @@ int sniff_packets(int **ports);
 
 #define USAGE(program_name, retcode) do{ \
 fprintf(stderr, "USAGE: %s %s\n", program_name, \
-"[-h] [-p|-s] [-c CONFIG] [-l LOGPATH]\n" \
+"[-h] [-y|-z] [-c CONFIG] [-l LOGPATH] [-a ADDRESS] [-p PORT] [-t TOPIC]\n" \
 "    -h       Help: displays this help menu.\n" \
-"    -p       Publisher: create a publisher node\n" \
-"    -s       Subscriber: create a subscriber\n" \
+"    -y       Publisher: create a publisher node\n" \
+"    -z       Subscriber: create a subscriber\n" \
 "    -c       Config: Specify the location of a config file\n" \
-"    -l       Log: Specify the location of a log file to read or write from"); \
+"    -a       Address: Specify server address\n" \
+"    -p       Port: Specify server port\n" \
+"    -t       Topic: Specify topic to subscribe/publish to"); \
 exit(retcode); \
 } while(0)
 
