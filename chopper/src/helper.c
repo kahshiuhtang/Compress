@@ -1,4 +1,4 @@
-#include "lumber.h"
+#include "mill.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>

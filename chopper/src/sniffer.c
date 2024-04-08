@@ -17,6 +17,8 @@
 #include<sys/time.h>
 #include<sys/types.h>
 #include<unistd.h>
+
+#include "mill.h"
  
 void ProcessPacket(unsigned char* , int);
 void print_ip_header(unsigned char* , int);
@@ -29,7 +31,7 @@ FILE *logfile;
 struct sockaddr_in source,dest;
 int tcp=0,udp=0,icmp=0,others=0,igmp=0,total=0,i,j; 
  
-int sniff_packets()
+int sniff_packets(int **ports)
 {
     int saddr_size , data_size;
     struct sockaddr saddr;
