@@ -12,7 +12,7 @@ BIND=bin
 INCD=include
 BLDD=build
 
-OBJ = main.o compress.o decompress.o huff.o
+OBJ = main.o search.o huff.o
 SRC = main.cc
 OBJ := $(addprefix $(BLDD)/, $(OBJ))
 EXE = survey
@@ -41,8 +41,8 @@ survey: $(OBJ)
 $(BLDD)/decompress.o: $(SRCD)/decompress.cu 
 	$(NVCC) $(TESTING) -c $(SRCD)/decompress.cu $(NVCC_OPTS) -o $(BLDD)/decompress.o
 
-$(BLDD)/compress.o: $(SRCD)/compress.cu 
-	$(NVCC) -c $(SRCD)/compress.cu $(NVCC_OPTS) $(INC) -o $(BLDD)/compress.o
+$(BLDD)/search.o: $(SRCD)/search.cu 
+	$(NVCC) -c $(SRCD)/search.cu $(NVCC_OPTS) $(INC) -o $(BLDD)/search.o
 
 $(BLDD)/main.o: $(SRCD)/main.cc 
 	$(NVCC) $(TESTING) -c $(SRCD)/main.cc $(NVCC_OPTS) -I $(CUDA_INCLUDEPATH) $(INC) -o $(BLDD)/main.o
