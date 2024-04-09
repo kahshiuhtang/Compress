@@ -69,6 +69,8 @@ int main(int argc, char* argv[])
     }else{
         fprintf(stderr, "Success in opening file.\n");
     }
+    int *host_prefix_tbl = (int *) malloc(sizeof(int) * strlen(host_pattern));
+    generate_prefix_table(host_pattern, strlen(host_pattern), host_prefix_tbl);
 
     char *host_buffer = (char *) malloc(sizeof(char) * 128000);
     int ch;
@@ -82,15 +84,24 @@ int main(int argc, char* argv[])
 
     char *dev_buffer;
     char *dev_pattern;
+    char *dev_prefix_tbl;
 
     cudaMalloc(&dev_buffer, curr_idx); 
     cudaMemcpy(host_buffer, dev_buffer, curr_idx, cudaMemcpyHostToDevice);
 
     cudaMalloc(&dev_pattern, strlen(host_pattern));
     cudaMemcpy(host_pattern, dev_pattern, strlen(host_pattern), cudaMemcpyHostToDevice);
+
+    cudaMalloc(&dev_prefix_tbl, strlen(host_pattern));
+    cudaMemcpy(host_prefix_tbl, dev_prefix_tbl, strlen(host_pattern), cudaMemcpyHostToDevice);
     KMP<<<256, 256>>>(dev_buffer, dev_pattern);
+
     cudaFree(dev_buffer);
-    free(buffer);
+    cudaFree(dev_pattern);
+    cudaFree(dev_prefix_tbl);
+    free(host_buffer);
+    free(host_pattern);
+    free(host_prefix_tbl);
     return EXIT_SUCCESS;
 }
 
