@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <iostream>
+#include <cstring>
+#include <fstream>
+#include "time.h"
 #include "search.cuh"
 
 void generate_prefix_table(char * pattern, int len, int prefix_tbl[]){
@@ -49,10 +53,44 @@ __global__ void KMP(char* pattern, char* target,int f[],int c[],int n, int m)
     }
     return;
 }
+ 
+int main(int argc, char* argv[])
+{
+    FILE *fptr;
+    char *host_pattern;
+    fptr = fopen("./rsrc/input.txt", "r"); 
+    if(argc < 2){
+        return EXIT_FAILURE;
+    }
+    host_pattern = argc[1];
+    if(fptr == NULL){
+        fprintf(stderr, "Error reading from file address\n");
+        return EXIT_FAILURE;
+    }else{
+        fprintf(stderr, "Success in opening file.\n");
+    }
 
+    char *host_buffer = (char *) malloc(sizeof(char) * 128000);
+    int ch;
+    int curr_idx;
+    do {
+        ch = fgetc(fptr);
+        printf("%c", ch);
+        host_buffer[curr_idx] = ch;
+        curr_idx++;
+    } while (ch != EOF);
 
+    char *dev_buffer;
+    char *dev_pattern;
 
-// Read in a file
-// Split it into sections
-// 
+    cudaMalloc(&dev_buffer, curr_idx); 
+    cudaMemcpy(host_buffer, dev_buffer, curr_idx, cudaMemcpyHostToDevice);
+
+    cudaMalloc(&dev_pattern, strlen(host_pattern));
+    cudaMemcpy(host_pattern, dev_pattern, strlen(host_pattern), cudaMemcpyHostToDevice);
+    KMP<<<256, 256>>>(dev_buffer, dev_pattern);
+    cudaFree(dev_buffer);
+    free(buffer);
+    return EXIT_SUCCESS;
+}
 
