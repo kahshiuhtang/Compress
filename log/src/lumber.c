@@ -153,7 +153,10 @@ void _send_messages(char *server_address, char *server_port, char* server_topic)
     }
     running_daemon->tid = client_daemon;
 
-    while(fgetc(stdin) == '\n') {
+    FILE *log_output = fdopen(running_daemon->write_fd, "r");
+    char buffer[MAX_LOG_MSG_LENGTH];
+
+    while(fgets(buffer, MAX_LOG_MSG_LENGTH, log_output) != NULL) {
         /* get the current time */
         time_t timer;
         time(&timer);
@@ -161,8 +164,8 @@ void _send_messages(char *server_address, char *server_port, char* server_topic)
         char timebuf[26];
         strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-        char application_message[256];
-        snprintf(application_message, sizeof(application_message), "The time is %s", timebuf);
+        char application_message[MAX_LOG_MSG_LENGTH*2];
+        snprintf(application_message, MAX_LOG_MSG_LENGTH*2, "[%s][%d][1][%s]", timebuf, running_daemon->pid, buffer);
 
         /* publish the time */
         mqtt_publish(&client, topic, application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_0);
@@ -242,7 +245,7 @@ void __listen_message(char *server_address, char *server_port, char* server_topi
     char buffer[MAX_LOG_MSG_LENGTH];
     while((c = fgetc(stdin)) != EOF){
         if(idx == MAX_LOG_MSG_LENGTH){
-            syslog(LOG_NOTICE, buffer);
+            syslog(LOG_NOTICE, "%s", buffer);
             idx = 0;
         }else{
             buffer[idx] = c;

@@ -14,7 +14,7 @@ In order to be able to search through logs faster, it is important to be able to
 
 Here is the current state:
 
-[SERVER][PORT][PROCESS][SERVERITY][TYPE][MESSAGE]
+[TIME][PROCESS][SEVERITY][MESSAGE]
 
 There may be an easier way to send messages in groups, but I have not figured that out. This should allow for an easier way of sorting through files based on Server/Port/Process. It seems useful to keep a strict format of messages and fill in any blanks with spaces, but that mat increase message size too much.
 
